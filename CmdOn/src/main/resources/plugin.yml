@@ -1,0 +1,14 @@
+name: CmdOn
+version: '${project.version}'
+main: net.nutchi.cmdon.CmdOn
+api-version: '1.16'
+author: Nutchi
+description: Execute commands on the specific event
+commands:
+  cmdon:
+    permission: cmdon.command.cmdon
+    usage: |
+      /<command> reload
+permissions:
+  cmdon.command.cmdon:
+    default: op

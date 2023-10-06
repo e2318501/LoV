@@ -1,0 +1,7 @@
+cmds:
+  LOGIN: []
+  FIRST_LOGIN:
+    - tellraw %player% "Welcome to our server!"
+    - give %player% apple 5
+  NON_FIRST_LOGIN:
+    - tellraw %player% "Hi, %player%!"

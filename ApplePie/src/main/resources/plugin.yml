@@ -1,0 +1,4 @@
+name: ApplePie
+version: '${project.version}'
+main: net.nutchi.applepie.ApplePie
+api-version: 1.19

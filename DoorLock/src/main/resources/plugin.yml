@@ -1,0 +1,14 @@
+name: DoorLock
+version: '${project.version}'
+main: net.nutchi.doorlock.DoorLock
+api-version: '1.16'
+commands:
+  doorlock:
+    permission: doorlock.command.doorlock
+    usage: |
+      /<command> create <keyType> <customModelData>
+      /<command> delete
+      /<command> cancel
+permissions:
+  doorlock.command.doorlock:
+    default: op

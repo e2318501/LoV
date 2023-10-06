@@ -1,0 +1,10 @@
+name: PersonalChest
+version: '${project.version}'
+main: net.nutchi.personalchest.PersonalChest
+api-version: '1.16'
+commands:
+  personalchest:
+    usage: |
+      /<command> apply
+      /<command> remove
+      /<command> open [<name>]
