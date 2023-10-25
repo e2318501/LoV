@@ -9,3 +9,7 @@ commands:
 permissions:
   sharelocation.command:
     default: op
+  sharelocation.add:
+    default: op
+  sharelocation.edit:
+    default: op

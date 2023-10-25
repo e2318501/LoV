@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -74,9 +73,9 @@ public class Gui {
 
         if (!onEditMode && isTpButton) {
             getTeleportLocation(currentItem.getItemMeta()).ifPresent(player::teleport);
-        } else if (isAddButton) {
+        } else if (isAddButton && player.hasPermission("sharelocation.add")) {
             openAddDialog(player);
-        } else if (!onEditMode && isEditButton) {
+        } else if (!onEditMode && isEditButton && player.hasPermission("sharelocation.edit")) {
             enterEditMode(player);
         } else if (onEditMode && isEditButton) {
             leaveEditMode(player);
