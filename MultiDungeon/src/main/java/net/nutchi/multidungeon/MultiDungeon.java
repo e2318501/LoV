@@ -1,25 +1,26 @@
 package net.nutchi.multidungeon;
 
 import lombok.Getter;
+import net.nutchi.multidungeon.listener.PlayerListener;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
 public final class MultiDungeon extends JavaPlugin {
     private final DungeonManager dungeonManager = new DungeonManager(this);
     private final DungeonGenerator dungeonGenerator = new DungeonGenerator(this);
+    private final DungeonUtil dungeonUtil = new DungeonUtil(this);
+    private final BossRoom bossRoom = new BossRoom(this);
     private final Storage storage = new Storage(this);
 
     @Override
@@ -27,13 +28,19 @@ public final class MultiDungeon extends JavaPlugin {
         if (storage.connect()) {
             storage.init();
             storage.loadDungeons();
+            regsiter();
         } else {
             getServer().getPluginManager().disablePlugin(this);
         }
     }
 
+    private void regsiter() {
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+    }
+
     @Override
     public void onDisable() {
+        bossRoom.restorePlayersGamemode();
         storage.shutdown();
     }
 
@@ -59,6 +66,10 @@ public final class MultiDungeon extends JavaPlugin {
                 } else {
                     sender.sendMessage(ChatColor.RED + "そのような名前のダンジョンは存在しません！");
                 }
+
+                return true;
+            } else if (args[0].equals("info") && args.length == 2) {
+                sender.sendMessage(dungeonManager.getDungeonInfo(args[1]));
 
                 return true;
             } else if (args[0].equals("addReplica") && args.length == 2 && sender instanceof Player) {
@@ -106,6 +117,30 @@ public final class MultiDungeon extends JavaPlugin {
                 getPlayer(args[2]).ifPresent(p -> dungeonManager.joinDungeonAlone(args[1], p));
 
                 return true;
+            } else if (args[0].equals("playSingle") && args.length == 3) {
+                getPlayer(args[2]).ifPresent(p -> dungeonManager.playSingle(args[1], p));
+
+                return true;
+            } else if (args[0].equals("playMulti") && args.length == 3) {
+                getPlayer(args[2]).ifPresent(p -> dungeonManager.playMulti(args[1], p));
+
+                return true;
+            } else if (args[0].equals("cancelMultiPlayWaiting") && args.length == 2) {
+                getPlayer(args[1]).ifPresent(dungeonManager::cancelMultiPlayWaiting);
+
+                return true;
+            } else if (args[0].equals("execReplicaRelative") && args.length >= 3) {
+                dungeonUtil.executeCommandAtPlayerPlayingReplicaRelativeCoordinate(args[1], sender, String.join(" ", Arrays.copyOfRange(args, 2, args.length)));
+
+                return true;
+            } else if (args[0].equals("setSpectator") && args.length == 2) {
+                bossRoom.setSpectator(args[1]);
+
+                return true;
+            } else if (args[0].equals("unsetSpectator") && args.length == 2) {
+                bossRoom.unsetSpectator(args[1]);
+
+                return true;
             }
         }
 
@@ -116,13 +151,27 @@ public final class MultiDungeon extends JavaPlugin {
         return Optional.ofNullable(getServer().getPlayer(name));
     }
 
+    Optional<UUID> getPlayerUuid(String name) {
+        return Optional.ofNullable(getServer().getPlayer(name)).map(Entity::getUniqueId);
+    }
+
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return filter(Arrays.asList("create", "delete", "setPlayerLimit", "addReplica", "listReplicas", "removeReplica", "save", "finish", "joinOrdered", "joinRoundRobin", "joinAlone"), args[0]);
+            return filter(Arrays.asList("create", "delete", "setPlayerLimit", "info", "addReplica", "listReplicas", "removeReplica", "save", "finish", "joinOrdered", "joinRoundRobin", "joinAlone", "playSingle", "playMulti", "cancelMultiPlayWaiting", "execReplicaRelative", "setSpectator", "unsetSpectator"), args[0]);
         } else if (args.length == 2) {
-            return filter(dungeonManager.getDungeonNames(), args[1]);
+            switch (args[0]) {
+                case "cancelMultiPlayWaiting":
+                case "execReplicaRelative":
+                    return filter(getServer().getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()), args[1]);
+                case "setSpectator":
+                    return filter(getServer().getOnlinePlayers().stream().map(HumanEntity::getName).filter(n -> !bossRoom.getSpectatorNames().contains(n)).collect(Collectors.toList()), args[1]);
+                case "unsetSpectator":
+                    return filter(bossRoom.getSpectatorNames(), args[1]);
+                default:
+                    return filter(dungeonManager.getDungeonNames(), args[1]);
+            }
         } else if (args.length == 3) {
             switch (args[0]) {
                 case "setPlayerLimit":
@@ -137,6 +186,8 @@ public final class MultiDungeon extends JavaPlugin {
                 case "joinOrdered":
                 case "joinRoundRobin":
                 case "joinAlone":
+                case "playSingle":
+                case "playMulti":
                     return filter(getServer().getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()), args[2]);
             }
         }
@@ -146,5 +197,9 @@ public final class MultiDungeon extends JavaPlugin {
 
     private List<String> filter(List<String> source, String typing) {
         return source.stream().filter(s -> s.toLowerCase().startsWith(typing.toLowerCase())).collect(Collectors.toList());
+    }
+
+    public Optional<Player> getPlayer(UUID uuid) {
+        return Optional.ofNullable(getServer().getPlayer(uuid));
     }
 }

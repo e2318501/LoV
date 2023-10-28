@@ -89,7 +89,7 @@ public class Storage {
                                 ResultSet playerLastLocResult = playerLastLocStatement.executeQuery();
                                 while (playerLastLocResult.next()) {
                                     UUID playerUuid = UUID.fromString(playerLastLocResult.getString("player_uuid"));
-                                    Location playerLastLoc = gson.fromJson(replicaResult.getString("location"), GsonParsableLocation.class).getLocation(plugin);
+                                    Location playerLastLoc = gson.fromJson(playerLastLocResult.getString("location"), GsonParsableLocation.class).getLocation(plugin);
 
                                     if (playerLastLoc != null) {
                                         replica.getPlayerLastLocations().put(playerUuid, playerLastLoc);
@@ -147,6 +147,24 @@ public class Storage {
             statement.setString(2, dungeonName);
 
             statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void savePlayerLastLocations(DungeonReplica replica) {
+        try (PreparedStatement statement = connection.prepareStatement("INSERT INTO player_last_locations (player_uuid, replica_id, location) VALUES (?, ?, ?)")) {
+            replica.getPlayerLastLocations().forEach(((uuid, loc) -> {
+                try {
+                    statement.setString(1, uuid.toString());
+                    statement.setInt(2, replica.getId());
+                    statement.setString(3, gson.toJson(GsonParsableLocation.fromLocation(loc)));
+
+                    statement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }));
         } catch (SQLException e) {
             e.printStackTrace();
         }

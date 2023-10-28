@@ -6,10 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class DungeonManager {
@@ -66,13 +63,30 @@ public class DungeonManager {
         }
     }
 
+    public Optional<Location> getPlayerPlayingReplicaStartLocation(UUID uuid) {
+        return dungeons.values()
+                .stream()
+                .map(d -> d.getPlayerPlayingReplicaStartLocation(uuid))
+                .filter(Optional::isPresent)
+                .findAny()
+                .flatMap(l -> l);
+    }
+
     public List<String> getDungeonNames() {
         return new ArrayList<>(dungeons.keySet());
     }
 
+    public String getDungeonInfo(String name) {
+        if (dungeons.containsKey(name)) {
+            return dungeons.get(name).getInfo();
+        } else {
+            return "";
+        }
+    }
+
     public String getDungeonReplicaInfo(String name) {
         if (dungeons.containsKey(name)) {
-            return dungeons.get(name).getReplicaInfo();
+            return dungeons.get(name).getReplicaInfo(plugin);
         } else {
             return "";
         }
@@ -85,6 +99,22 @@ public class DungeonManager {
         } else {
             return false;
         }
+    }
+
+    public void playSingle(String name, Player player) {
+        if (dungeons.containsKey(name)) {
+            dungeons.get(name).playSingle(plugin, player);
+        }
+    }
+
+    public void playMulti(String name, Player player) {
+        if (dungeons.containsKey(name)) {
+            dungeons.get(name).playMulti(plugin, player);
+        }
+    }
+
+    public void cancelMultiPlayWaiting(Player player) {
+        dungeons.forEach((name, dungeon) -> dungeon.cancelMultiPlayWaiting(player));
     }
 
     public void joinDungeonOrdered(String name, Player player) {
@@ -115,6 +145,7 @@ public class DungeonManager {
         if (dungeons.containsKey(name)) {
             dungeons.get(name).leavePlayersFromReplica(plugin, id);
 
+            dungeons.get(name).setReplicaLock(id, false);
             Location loc = dungeons.get(name).getReplicaStartLocation(id);
             if (loc != null) {
                 plugin.getDungeonGenerator().restoreDungeon(name, loc);

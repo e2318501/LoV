@@ -19,6 +19,10 @@ commands:
       /<command> joinOrdered <dungeon> <player>
       /<command> joinRoundRobin <dungeon> <player>
       /<command> joinAlone <dungeon> <player>
+      /<command> playSingle <dungeon> <player>
+      /<command> playMulti <dungeon> <player>
+      /<command> cancelMultiPlayWaiting <player>
+      /<command> execReplicaRelative <player> <command..>
 permissions:
   multidungeon.command.multidungeon:
     default: op
