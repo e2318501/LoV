@@ -2,6 +2,7 @@ package net.nutchi.multidungeon.listener;
 
 import lombok.RequiredArgsConstructor;
 import net.nutchi.multidungeon.MultiDungeon;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -12,8 +13,12 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if (plugin.getBossRoom().isSpectator(event.getPlayer())) {
+        if (event.getTo() != null && isDifferentCoordinate(event.getFrom(), event.getTo()) && plugin.getBossRoom().isSpectator(event.getPlayer())) {
             event.setCancelled(true);
         }
+    }
+
+    private boolean isDifferentCoordinate(Location loc1, Location loc2) {
+        return loc1.getX() != loc2.getX() || loc1.getY() != loc2.getY() || loc1.getZ() != loc2.getZ();
     }
 }
