@@ -69,8 +69,8 @@ public class Storage {
                 String dungeonName = dungeonResult.getString("name");
                 int playerLimit = dungeonResult.getInt("player_limit");
 
-                Dungeon dungeon = new Dungeon(playerLimit);
-                plugin.getDungeonManager().getDungeons().put(dungeonName, dungeon);
+                Dungeon dungeon = new Dungeon(dungeonName, playerLimit);
+                plugin.getDungeonManager().getDungeons().add(dungeon);
 
                 try (PreparedStatement replicaStatement = connection.prepareStatement("SELECT * FROM replicas WHERE dungeon_name = ?")) {
                     replicaStatement.setString(1, dungeonName);
@@ -81,7 +81,7 @@ public class Storage {
                         Location startLoc = gson.fromJson(replicaResult.getString("start_location"), GsonParsableLocation.class).getLocation(plugin);
 
                         if (startLoc != null) {
-                            DungeonReplica replica = new DungeonReplica(replicaId, startLoc);
+                            DungeonReplica replica = new DungeonReplica(dungeonName, replicaId, startLoc);
 
                             try (PreparedStatement playerLastLocStatement = connection.prepareStatement("SELECT * FROM player_last_locations WHERE replica_id = ?")) {
                                 playerLastLocStatement.setInt(1, replicaId);

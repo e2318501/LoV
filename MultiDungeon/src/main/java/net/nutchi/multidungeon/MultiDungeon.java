@@ -28,13 +28,13 @@ public final class MultiDungeon extends JavaPlugin {
         if (storage.connect()) {
             storage.init();
             storage.loadDungeons();
-            regsiter();
+            register();
         } else {
             getServer().getPluginManager().disablePlugin(this);
         }
     }
 
-    private void regsiter() {
+    private void register() {
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
     }
 
@@ -105,18 +105,6 @@ public final class MultiDungeon extends JavaPlugin {
                 dungeonManager.finishDungeonReplica(args[1], Integer.parseInt(args[2]));
 
                 return true;
-            } else if (args[0].equals("joinOrdered") && args.length == 3) {
-                getPlayer(args[2]).ifPresent(p -> dungeonManager.joinDungeonOrdered(args[1], p));
-
-                return true;
-            } else if (args[0].equals("joinRoundRobin") && args.length == 3) {
-                getPlayer(args[2]).ifPresent(p -> dungeonManager.joinDungeonRoundRobin(args[1], p));
-
-                return true;
-            } else if (args[0].equals("joinAlone") && args.length == 3) {
-                getPlayer(args[2]).ifPresent(p -> dungeonManager.joinDungeonAlone(args[1], p));
-
-                return true;
             } else if (args[0].equals("playSingle") && args.length == 3) {
                 getPlayer(args[2]).ifPresent(p -> dungeonManager.playSingle(args[1], p));
 
@@ -159,7 +147,7 @@ public final class MultiDungeon extends JavaPlugin {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return filter(Arrays.asList("create", "delete", "setPlayerLimit", "info", "addReplica", "listReplicas", "removeReplica", "save", "finish", "joinOrdered", "joinRoundRobin", "joinAlone", "playSingle", "playMulti", "cancelMultiPlayWaiting", "execReplicaRelative", "setSpectator", "unsetSpectator"), args[0]);
+            return filter(Arrays.asList("create", "delete", "setPlayerLimit", "info", "addReplica", "listReplicas", "removeReplica", "save", "finish", "playSingle", "playMulti", "cancelMultiPlayWaiting", "execReplicaRelative", "setSpectator", "unsetSpectator"), args[0]);
         } else if (args.length == 2) {
             switch (args[0]) {
                 case "cancelMultiPlayWaiting":
@@ -178,14 +166,11 @@ public final class MultiDungeon extends JavaPlugin {
                     return filter(Collections.singletonList("10"), args[2]);
                 case "removeReplica":
                 case "finish":
-                    if (dungeonManager.getDungeons().containsKey(args[1])) {
-                        return filter(dungeonManager.getDungeons().get(args[1]).getDungeonReplicas().stream().map(r -> String.valueOf(r.getId())).collect(Collectors.toList()), args[2]);
+                    if (dungeonManager.getDungeon(args[1]).isPresent()) {
+                        return filter(dungeonManager.getDungeon(args[1]).get().getDungeonReplicas().stream().map(r -> String.valueOf(r.getId())).collect(Collectors.toList()), args[2]);
                     } else {
                         return Collections.emptyList();
                     }
-                case "joinOrdered":
-                case "joinRoundRobin":
-                case "joinAlone":
                 case "playSingle":
                 case "playMulti":
                     return filter(getServer().getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()), args[2]);

@@ -2,23 +2,23 @@ package net.nutchi.multidungeon;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class DungeonManager {
     private final MultiDungeon plugin;
     @Getter
-    private final Map<String, Dungeon> dungeons = new HashMap<>();
+    private final List<Dungeon> dungeons = new ArrayList<>();
 
     public boolean addDungeon(String name) {
-        if (!dungeons.containsKey(name)) {
-            dungeons.put(name, new Dungeon(10));
-
+        if (!getDungeon(name).isPresent()) {
+            dungeons.add(new Dungeon(name, 10));
             plugin.getStorage().saveDungeon(name);
+
             return true;
         } else {
             return false;
@@ -26,15 +26,15 @@ public class DungeonManager {
     }
 
     public void removeDungeon(String name) {
-        dungeons.remove(name);
+        dungeons.removeIf(d -> d.getName().equals(name));
         plugin.getStorage().deleteDungeon(name);
     }
 
     public boolean setPlayerLimit(String name, int playerLimit) {
-        if (dungeons.containsKey(name)) {
-            dungeons.put(name, new Dungeon(playerLimit));
-
+        if (getDungeon(name).isPresent()) {
+            dungeons.add(new Dungeon(name, playerLimit));
             plugin.getStorage().savePlayerLimit(name, playerLimit);
+
             return true;
         } else {
             return false;
@@ -42,10 +42,11 @@ public class DungeonManager {
     }
 
     public boolean addReplica(String name, Location startLoc) {
-        if (dungeons.containsKey(name)) {
-            int id = dungeons.get(name).addReplica(startLoc);
-
+        Optional<Dungeon> dungeon = getDungeon(name);
+        if (dungeon.isPresent()) {
+            int id = dungeon.get().addReplica(name, startLoc);
             plugin.getStorage().saveReplica(id, name, startLoc);
+
             return true;
         } else {
             return false;
@@ -53,10 +54,11 @@ public class DungeonManager {
     }
 
     public boolean removeDungeonReplica(String name, int id) {
-        if (dungeons.containsKey(name)) {
-            dungeons.get(name).removeReplica(id);
-
+        Optional<Dungeon> dungeon = getDungeon(name);
+        if (dungeon.isPresent()) {
+            dungeon.get().removeReplica(id);
             plugin.getStorage().deleteReplica(id, name);
+
             return true;
         } else {
             return false;
@@ -64,7 +66,7 @@ public class DungeonManager {
     }
 
     public Optional<Location> getPlayerPlayingReplicaStartLocation(UUID uuid) {
-        return dungeons.values()
+        return dungeons
                 .stream()
                 .map(d -> d.getPlayerPlayingReplicaStartLocation(uuid))
                 .filter(Optional::isPresent)
@@ -73,28 +75,21 @@ public class DungeonManager {
     }
 
     public List<String> getDungeonNames() {
-        return new ArrayList<>(dungeons.keySet());
+        return dungeons.stream().map(Dungeon::getName).collect(Collectors.toList());
     }
 
     public String getDungeonInfo(String name) {
-        if (dungeons.containsKey(name)) {
-            return dungeons.get(name).getInfo();
-        } else {
-            return "";
-        }
+        return getDungeon(name).map(Dungeon::getInfo).orElse("");
     }
 
     public String getDungeonReplicaInfo(String name) {
-        if (dungeons.containsKey(name)) {
-            return dungeons.get(name).getReplicaInfo(plugin);
-        } else {
-            return "";
-        }
+        return getDungeon(name).map(d -> d.getReplicaInfo(plugin)).orElse("");
     }
 
     public boolean saveDungeon(Player player, String name) {
-        if (dungeons.containsKey(name)) {
+        if (getDungeon(name).isPresent()) {
             plugin.getDungeonGenerator().saveDungeon(player, name);
+
             return true;
         } else {
             return false;
@@ -102,54 +97,26 @@ public class DungeonManager {
     }
 
     public void playSingle(String name, Player player) {
-        if (dungeons.containsKey(name)) {
-            dungeons.get(name).playSingle(plugin, player);
-        }
+        getDungeon(name).ifPresent(d -> d.playSingle(plugin, player));
     }
 
     public void playMulti(String name, Player player) {
-        if (dungeons.containsKey(name)) {
-            dungeons.get(name).playMulti(plugin, player);
-        }
+        getDungeon(name).ifPresent(d -> d.playMulti(plugin, player));
     }
 
     public void cancelMultiPlayWaiting(Player player) {
-        dungeons.forEach((name, dungeon) -> dungeon.cancelMultiPlayWaiting(player));
-    }
-
-    public void joinDungeonOrdered(String name, Player player) {
-        if (dungeons.containsKey(name)) {
-            if (!dungeons.get(name).joinOrdered(player)) {
-                player.sendMessage(ChatColor.GOLD + "ただいまダンジョンは満員です！");
-            }
-        }
-    }
-
-    public void joinDungeonRoundRobin(String name, Player player) {
-        if (dungeons.containsKey(name)) {
-            if (!dungeons.get(name).joinRoundRobin(player)) {
-                player.sendMessage(ChatColor.GOLD + "ただいまダンジョンは満員です！");
-            }
-        }
-    }
-
-    public void joinDungeonAlone(String name, Player player) {
-        if (dungeons.containsKey(name)) {
-            if (!dungeons.get(name).joinAlone(player)) {
-                player.sendMessage(ChatColor.GOLD + "ただいまダンジョンは満員です！");
-            }
-        }
+        dungeons.forEach(d -> d.cancelMultiPlayWaiting(player));
     }
 
     public void finishDungeonReplica(String name, int id) {
-        if (dungeons.containsKey(name)) {
-            dungeons.get(name).leavePlayersFromReplica(plugin, id);
+        getDungeon(name).ifPresent(d -> d.finishReplica(plugin, id));
+    }
 
-            dungeons.get(name).setReplicaLock(id, false);
-            Location loc = dungeons.get(name).getReplicaStartLocation(id);
-            if (loc != null) {
-                plugin.getDungeonGenerator().restoreDungeon(name, loc);
-            }
-        }
+    public void quitPlayer(UUID player) {
+        dungeons.forEach(d -> d.quitPlayer(plugin, player));
+    }
+
+    public Optional<Dungeon> getDungeon(String name) {
+        return dungeons.stream().filter(d -> d.getName().equals(name)).findAny();
     }
 }

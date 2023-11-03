@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Setter
 @RequiredArgsConstructor
 public class DungeonReplica {
+    private final String dungeonName;
     private final int id;
     private final Location startLocation;
     private final Map<UUID, Location> playerLastLocations = new HashMap<>();
@@ -51,5 +52,13 @@ public class DungeonReplica {
         }));
 
         playerLastLocations.clear();
+    }
+
+    public void leavePlayer(UUID player) {
+        playerLastLocations.remove(player);
+    }
+
+    public boolean isEmpty() {
+        return playerLastLocations.isEmpty();
     }
 }

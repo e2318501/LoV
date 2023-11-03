@@ -16,9 +16,6 @@ commands:
       /<command> removeReplica <dungeon> <id>
       /<command> save <dungeon>
       /<command> finish <dungeon> <id>
-      /<command> joinOrdered <dungeon> <player>
-      /<command> joinRoundRobin <dungeon> <player>
-      /<command> joinAlone <dungeon> <player>
       /<command> playSingle <dungeon> <player>
       /<command> playMulti <dungeon> <player>
       /<command> cancelMultiPlayWaiting <player>
