@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,11 +16,11 @@ public class DungeonReplica {
     private final String dungeonName;
     private final int id;
     private final Location startLocation;
-    private final Map<UUID, Location> playerLastLocations = new HashMap<>();
+    private final List<UUID> players = new ArrayList<>();
     private boolean locked = false;
 
     public int getPlayerNumber() {
-        return playerLastLocations.size();
+        return players.size();
     }
 
     public String getInfo(MultiDungeon plugin) {
@@ -30,8 +28,7 @@ public class DungeonReplica {
     }
 
     private List<String> getOnlinePlayers(MultiDungeon plugin) {
-        return playerLastLocations.keySet()
-                .stream()
+        return players.stream()
                 .map(plugin::getPlayer)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -39,26 +36,23 @@ public class DungeonReplica {
                 .collect(Collectors.toList());
     }
 
-    public void joinPlayer(UUID uuid, Location originalLocation) {
-        playerLastLocations.put(uuid, originalLocation);
+    public void joinPlayer(UUID player) {
+        players.add(player);
     }
 
-    public void leavePlayers(JavaPlugin plugin) {
-        playerLastLocations.forEach(((uuid, loc) -> {
-           Player player = plugin.getServer().getPlayer(uuid);
-           if (player != null) {
-               // player.teleport(loc);
-           }
-        }));
-
-        playerLastLocations.clear();
+    public void leavePlayers() {
+        players.clear();
     }
 
     public void leavePlayer(UUID player) {
-        playerLastLocations.remove(player);
+        players.remove(player);
     }
 
     public boolean isEmpty() {
-        return playerLastLocations.isEmpty();
+        return players.isEmpty();
+    }
+
+    public boolean isPlaying(UUID player) {
+        return players.contains(player);
     }
 }

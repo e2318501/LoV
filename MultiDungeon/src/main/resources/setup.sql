@@ -12,9 +12,7 @@ CREATE TABLE IF NOT EXISTS replicas
     UNIQUE (id, dungeon_name)
 );
 
-CREATE TABLE IF NOT EXISTS player_last_locations
+CREATE TABLE IF NOT EXISTS db_version
 (
-    player_uuid         char(36) NOT NULL PRIMARY KEY,
-    replica_id          int(10) NOT NULL,
-    location            text NOT NULL
-)
+    version             int(10) NOT NULL DEFAULT 1
+);

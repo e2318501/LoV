@@ -97,7 +97,7 @@ public class DungeonManager {
     }
 
     public void playSingle(String name, Player player) {
-        getDungeon(name).ifPresent(d -> d.playSingle(plugin, player));
+        getDungeon(name).ifPresent(d -> d.playSingle(player));
     }
 
     public void playMulti(String name, Player player) {

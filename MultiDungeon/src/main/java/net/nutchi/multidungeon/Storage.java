@@ -6,7 +6,6 @@ import org.bukkit.Location;
 
 import java.io.*;
 import java.sql.*;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -81,23 +80,7 @@ public class Storage {
                         Location startLoc = gson.fromJson(replicaResult.getString("start_location"), GsonParsableLocation.class).getLocation(plugin);
 
                         if (startLoc != null) {
-                            DungeonReplica replica = new DungeonReplica(dungeonName, replicaId, startLoc);
-
-                            try (PreparedStatement playerLastLocStatement = connection.prepareStatement("SELECT * FROM player_last_locations WHERE replica_id = ?")) {
-                                playerLastLocStatement.setInt(1, replicaId);
-
-                                ResultSet playerLastLocResult = playerLastLocStatement.executeQuery();
-                                while (playerLastLocResult.next()) {
-                                    UUID playerUuid = UUID.fromString(playerLastLocResult.getString("player_uuid"));
-                                    Location playerLastLoc = gson.fromJson(playerLastLocResult.getString("location"), GsonParsableLocation.class).getLocation(plugin);
-
-                                    if (playerLastLoc != null) {
-                                        replica.getPlayerLastLocations().put(playerUuid, playerLastLoc);
-                                    }
-                                }
-                            }
-
-                            dungeon.getDungeonReplicas().add(replica);
+                            dungeon.getDungeonReplicas().add(new DungeonReplica(dungeonName, replicaId, startLoc));
                         }
 
                     }
@@ -147,24 +130,6 @@ public class Storage {
             statement.setString(2, dungeonName);
 
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void savePlayerLastLocations(DungeonReplica replica) {
-        try (PreparedStatement statement = connection.prepareStatement("INSERT INTO player_last_locations (player_uuid, replica_id, location) VALUES (?, ?, ?)")) {
-            replica.getPlayerLastLocations().forEach(((uuid, loc) -> {
-                try {
-                    statement.setString(1, uuid.toString());
-                    statement.setInt(2, replica.getId());
-                    statement.setString(3, gson.toJson(GsonParsableLocation.fromLocation(loc)));
-
-                    statement.executeUpdate();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }));
         } catch (SQLException e) {
             e.printStackTrace();
         }

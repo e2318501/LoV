@@ -32,12 +32,12 @@ public class Dungeon {
     }
 
     public Optional<DungeonReplica> getPlayerPlayingReplica(UUID player) {
-        return dungeonReplicas.stream().filter(r -> r.getPlayerLastLocations().containsKey(player)).findAny();
+        return dungeonReplicas.stream().filter(r -> r.isPlaying(player)).findAny();
     }
 
     public Optional<Location> getPlayerPlayingReplicaStartLocation(UUID uuid) {
         return dungeonReplicas.stream()
-                .filter(r -> r.getPlayerLastLocations().containsKey(uuid))
+                .filter(r -> r.isPlaying(uuid))
                 .map(DungeonReplica::getStartLocation)
                 .findAny();
     }
@@ -46,15 +46,13 @@ public class Dungeon {
         return dungeonReplicas.stream().map(r -> r.getInfo(plugin)).collect(Collectors.joining("\n"));
     }
 
-    public void playSingle(MultiDungeon plugin, Player player) {
+    public void playSingle(Player player) {
         Optional<DungeonReplica> replica = getAvailableReplica();
 
         if (replica.isPresent()) {
-            replica.get().joinPlayer(player.getUniqueId(), player.getLocation());
+            replica.get().joinPlayer(player.getUniqueId());
             replica.get().setLocked(true);
             player.teleport(replica.get().getStartLocation());
-
-            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getStorage().savePlayerLastLocations(replica.get()));
         } else {
             player.sendMessage(ChatColor.GREEN + "ダンジョンが定員に達しているためしばらくお待ちください");
         }
@@ -68,17 +66,15 @@ public class Dungeon {
             Optional<DungeonReplica> replica = getAvailableReplica();
 
             if (replica.isPresent()) {
-                replica.get().joinPlayer(player.getUniqueId(), player.getLocation());
+                replica.get().joinPlayer(player.getUniqueId());
                 player.teleport(replica.get().getStartLocation());
 
                 multiPlayWaitingPlayers.forEach(name -> plugin.getPlayer(name).ifPresent(p -> {
-                    replica.get().joinPlayer(p.getUniqueId(), p.getLocation());
+                    replica.get().joinPlayer(p.getUniqueId());
                     p.teleport(replica.get().getStartLocation());
                 }));
 
                 replica.get().setLocked(true);
-
-                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getStorage().savePlayerLastLocations(replica.get()));
             } else {
                 player.sendMessage(ChatColor.GREEN + "ダンジョンが定員に達しているためしばらくお待ちください");
             }
@@ -94,7 +90,7 @@ public class Dungeon {
 
     public void finishReplica(MultiDungeon plugin, int id) {
         getReplica(id).ifPresent(r -> {
-            r.leavePlayers(plugin);
+            r.leavePlayers();
             r.setLocked(false);
             plugin.getDungeonGenerator().restoreDungeon(name, r.getStartLocation());
         });
