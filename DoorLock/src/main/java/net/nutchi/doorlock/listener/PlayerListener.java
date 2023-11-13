@@ -36,10 +36,12 @@ public class PlayerListener implements Listener {
 
                                     event.getPlayer().getInventory().setItemInMainHand(null);
 
+                                    /*
                                     plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                                         door.setOpen(false);
                                         clicked.setBlockData(door);
                                     }, 100);
+                                     */
                                 } else {
                                     event.getPlayer().sendMessage(ChatColor.GOLD + "正しい鍵が必要です");
                                     event.setCancelled(true);

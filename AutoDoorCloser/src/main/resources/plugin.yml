@@ -1,0 +1,4 @@
+name: AutoDoorCloser
+version: '${project.version}'
+main: net.nutchi.autodoorcloser.AutoDoorCloser
+api-version: '1.16'
