@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.nutchi</groupId>
-    <artifactId>DropBroker</artifactId>
+    <artifactId>ItemTransactionLimiter</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>DropBroker</name>
+    <name>ItemTransactionLimiter</name>
 
     <properties>
         <java.version>1.8</java.version>

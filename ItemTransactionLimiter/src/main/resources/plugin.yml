@@ -1,0 +1,4 @@
+name: ItemTransactionLimiter
+version: '${project.version}'
+main: net.nutchi.itemtransactionlimiter.ItemTransactionLimiter
+api-version: '1.16'
