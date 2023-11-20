@@ -61,6 +61,8 @@ public class DungeonGenerator {
                 try (EditSession editSession = WorldEdit.getInstance().newEditSession(world)) {
                     Operation operation = new ClipboardHolder(clipboard)
                             .createPaste(editSession)
+                            .copyBiomes(true)
+                            .copyEntities(true)
                             .to(BlockVector3.at(baseLocation.getX(), baseLocation.getY(), baseLocation.getZ()))
                             .build();
                     Operations.complete(operation);
