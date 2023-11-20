@@ -2,6 +2,7 @@ package net.nutchi.itemtransactionlimiter.listener;
 
 import lombok.RequiredArgsConstructor;
 import net.nutchi.itemtransactionlimiter.ItemTransactionLimiter;
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -12,6 +13,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerDrop(PlayerDropItemEvent event) {
-        event.setCancelled(true);
+        if (event.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
+            event.setCancelled(true);
+        }
     }
 }
