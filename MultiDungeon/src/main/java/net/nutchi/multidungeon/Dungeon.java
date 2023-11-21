@@ -100,8 +100,10 @@ public class Dungeon {
         getPlayerPlayingReplica(player).ifPresent(r -> {
             r.leavePlayer(player);
             if (r.isEmpty()) {
-                plugin.getDungeonGenerator().restoreDungeon(name, r.getStartLocation());
-                r.setLocked(false);
+                plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                    plugin.getDungeonGenerator().restoreDungeon(name, r.getStartLocation());
+                    r.setLocked(false);
+                }, 200);
             }
         });
     }
