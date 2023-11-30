@@ -5,10 +5,14 @@ api-version: '1.19'
 depend: [ WorldGuardEvents ]
 commands:
     regionmusic:
-        description: RegionMusic command
-        usage: /<command> [reload]
         aliases: [ rm ]
+        description: RegionMusic command
         permission: regionmusic.command
+        usage: |
+            /<command> reload
+            /<command> mute <player>
+            /<command> unmute <player>
+            /<command> mutelist
 permissions:
     regionmusic.command:
         description: RegionMusic command
