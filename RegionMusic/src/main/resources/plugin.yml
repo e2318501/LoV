@@ -1,0 +1,15 @@
+name: RegionMusic
+version: '${project.version}'
+main: net.nutchi.regionmusic.RegionMusic
+api-version: '1.19'
+depend: [ WorldGuardEvents ]
+commands:
+    regionmusic:
+        description: RegionMusic command
+        usage: /<command> [reload]
+        aliases: [ rm ]
+        permission: regionmusic.command
+permissions:
+    regionmusic.command:
+        description: RegionMusic command
+        default: op

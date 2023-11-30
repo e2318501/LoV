@@ -1,0 +1,17 @@
+music:
+  - name: example1
+    enabled: false
+    region: example-region1
+    sound: "minecraft:bgm.example1"
+    volume: 1.0
+    pitch: 1.0
+    loop: true
+    duration: 2400
+  - name: example2
+    enabled: false
+    region: example-region2
+    sound: "minecraft:bgm.example2"
+    volume: 1.0
+    pitch: 1.0
+    loop: true
+    duration: 2400
