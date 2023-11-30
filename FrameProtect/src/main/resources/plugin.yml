@@ -1,4 +1,4 @@
 name: FrameProtect
 version: '${project.version}'
 main: net.nutchi.frameprotect.FrameProtect
-api-version: '1.16'
+api-version: '1.19'
