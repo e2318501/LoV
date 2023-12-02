@@ -16,6 +16,7 @@ public class MusicManager {
     private final List<Player> mutePlayerList = new ArrayList<>();
 
     public void makeMute(Player player) {
+        mutePlayerList.remove(player);
         mutePlayerList.add(player);
         stopMusic(player);
     }
