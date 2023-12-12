@@ -14,12 +14,12 @@ public class RegionListener implements Listener {
     @EventHandler
     public void onRegionEnter(RegionEnteredEvent event) {
         if (event.getPlayer() != null) {
-            plugin.getMusicManager().startMusic(event.getPlayer(), event.getRegionName());
+            plugin.getMusicManager().updateMusicLater(event.getPlayer());
         }
     }
 
     @EventHandler
     public void onRegionLeave(RegionLeftEvent event) {
-        plugin.getMusicManager().stopMusic(event.getPlayer(), event.getRegionName());
+        plugin.getMusicManager().updateMusicLater(event.getPlayer());
     }
 }

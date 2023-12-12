@@ -7,6 +7,7 @@ music:
     pitch: 1.0
     loop: true
     duration: 2400
+    priority: 0
   - name: example2
     enabled: false
     region: example-region2
@@ -15,3 +16,4 @@ music:
     pitch: 1.0
     loop: true
     duration: 2400
+    priority: 1

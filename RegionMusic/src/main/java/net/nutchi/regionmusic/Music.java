@@ -12,4 +12,5 @@ public class Music {
     private final float pitch;
     private final boolean loop;
     private final long duration;
+    private final int priority;
 }

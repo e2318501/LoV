@@ -32,7 +32,7 @@ public class MusicTask {
         return this.player.equals(player);
     }
 
-    public boolean isTarget(Player player, String region) {
-        return this.player.equals(player) && this.music.getRegion().equalsIgnoreCase(region);
+    public boolean isTarget(Player player, Music music) {
+        return this.player.equals(player) && this.music.equals(music);
     }
 }

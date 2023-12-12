@@ -5,7 +5,9 @@ import net.raidstone.wgevents.WorldGuardEvents;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class MusicManager {
 
     public void makeUnmute(Player player) {
         mutePlayerList.remove(player);
-        WorldGuardEvents.getRegionsNames(player.getUniqueId()).forEach(r -> startMusic(player, r));
+        WorldGuardEvents.getRegionsNames(player.getUniqueId()).forEach(r -> updateMusic(player));
     }
 
     public List<String> getMutePlayerNames() {
@@ -37,12 +39,24 @@ public class MusicManager {
         clearTask(player);
     }
 
-    public void startMusic(Player player, String region) {
+    public void updateMusicLater(Player player) {
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> updateMusic(player), 1L);
+    }
+
+    public void updateMusic(Player player) {
         if (!mutePlayerList.contains(player)) {
-            musicList.stream()
+            Optional<Music> music = musicList.stream()
                     .filter(Music::isEnabled)
-                    .filter(m -> m.getRegion().equalsIgnoreCase(region))
-                    .forEach(m -> musicTaskList.add(new MusicTask(plugin, player, m)));
+                    .filter(m -> WorldGuardEvents.getRegionsNames(player.getUniqueId()).contains(m.getRegion()))
+                    .max(Comparator.comparingInt(Music::getPriority));
+            if (music.isPresent()) {
+                if (musicTaskList.stream().noneMatch(t -> t.isTarget(player, music.get()))) {
+                    stopMusic(player);
+                    musicTaskList.add(new MusicTask(plugin, player, music.get()));
+                }
+            } else {
+                stopMusic(player);
+            }
         }
     }
 
@@ -51,13 +65,6 @@ public class MusicManager {
                 .filter(t -> t.isTarget(player))
                 .forEach(MusicTask::stopMusic);
         musicTaskList.removeIf(t -> t.isTarget(player));
-    }
-
-    public void stopMusic(Player player, String region) {
-        musicTaskList.stream()
-                .filter(t -> t.isTarget(player, region))
-                .forEach(MusicTask::stopMusic);
-        musicTaskList.removeIf(t -> t.isTarget(player, region));
     }
 
     public void loadMusic() {
@@ -73,8 +80,9 @@ public class MusicManager {
             float pitch = (float) (double) e.get("pitch");
             boolean loop = (boolean) e.get("loop");
             long duration = (long) (int) e.get("duration");
+            int priority = (int) e.get("priority");
 
-            musicList.add(new Music(name, enabled, region, sound, volume, pitch, loop, duration));
+            musicList.add(new Music(name, enabled, region, sound, volume, pitch, loop, duration, priority));
         });
     }
 

@@ -77,7 +77,7 @@ public class PChestManager {
     }
 
     private Inventory createPlayerInventory(Inventory defaultInventory) {
-        Inventory inv = plugin.getServer().createInventory(null, defaultInventory.getType());
+        Inventory inv = plugin.getServer().createInventory(null, defaultInventory.getSize());
         inv.setContents(defaultInventory.getContents());
         return inv;
     }
