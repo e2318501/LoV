@@ -4,18 +4,12 @@ import lombok.RequiredArgsConstructor;
 import net.nutchi.regionmusic.RegionMusic;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.*;
 
 @RequiredArgsConstructor
 public class PlayerListener implements Listener {
     private final RegionMusic plugin;
-
-    @EventHandler
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        plugin.getMusicManager().updateMusic(event.getPlayer());
-    }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
@@ -23,7 +17,12 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        plugin.getMusicManager().clearPlayer(event.getEntity().getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
         plugin.getMusicManager().updateMusic(event.getPlayer());
     }
 }

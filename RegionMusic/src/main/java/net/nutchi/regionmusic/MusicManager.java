@@ -25,7 +25,7 @@ public class MusicManager {
 
     public void makeUnmute(Player player) {
         mutePlayerList.remove(player);
-        WorldGuardEvents.getRegionsNames(player.getUniqueId()).forEach(r -> updateMusic(player));
+        updateMusic(player);
     }
 
     public List<String> getMutePlayerNames() {
@@ -37,10 +37,6 @@ public class MusicManager {
     public void clearPlayer(Player player) {
         mutePlayerList.remove(player);
         clearTask(player);
-    }
-
-    public void updateMusicLater(Player player) {
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> updateMusic(player), 1L);
     }
 
     public void updateMusic(Player player) {

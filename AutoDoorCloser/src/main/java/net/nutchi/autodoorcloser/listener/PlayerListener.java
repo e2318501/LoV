@@ -19,12 +19,12 @@ public class PlayerListener implements Listener {
         Block clicked = event.getClickedBlock();
         if (isTargetAction && clicked != null && clicked.getBlockData() instanceof Door) {
             Door door = (Door) clicked.getBlockData();
-            if (door.isOpen()) {
-                plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                if (door.isOpen()) {
                     door.setOpen(false);
                     clicked.setBlockData(door);
-                }, 200);
-            }
+                }
+            }, 200);
         }
     }
 }

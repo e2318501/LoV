@@ -2,11 +2,9 @@ package net.nutchi.regionmusic;
 
 import lombok.Getter;
 import net.nutchi.regionmusic.listener.PlayerListener;
-import net.nutchi.regionmusic.listener.RegionListener;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,9 +24,7 @@ public final class RegionMusic extends JavaPlugin {
 
         musicManager.loadMusic();
 
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new RegionListener(this), this);
-        pm.registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
     }
 
     @Override
