@@ -1,0 +1,4 @@
+name: ArmorStandProtect
+version: '${project.version}'
+main: net.nutchi.armorstandprotect.ArmorStandProtect
+api-version: '1.19'
