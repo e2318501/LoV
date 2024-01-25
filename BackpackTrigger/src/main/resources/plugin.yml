@@ -1,0 +1,4 @@
+name: BackpackTrigger
+version: '${project.version}'
+main: net.nutchi.backpacktrigger.BackpackTrigger
+api-version: 1.19
