@@ -1,33 +1,21 @@
 package net.nutchi.backpacktrigger;
 
-import java.util.Collections;
-
-import org.bukkit.ChatColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class BackpackTrigger extends JavaPlugin implements Listener {
-    private static final int triggerSlot = 9;
+    private static final int triggerSlot = 8;
     private static final Material triggerMaterial = Material.PAPER;
     private static final int triggerItemCustomModelData = 10048;
-    private static final String triggerCommand = "backpack";
+    private static final String triggerCommand = "commandpanel menu";
 
     @Override
     public void onEnable() {
@@ -37,9 +25,20 @@ public final class BackpackTrigger extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getSlot() == triggerSlot && event.getCurrentItem() != null && isTriggerItem(event.getCurrentItem()) {
+        if (event.getSlot() == triggerSlot && event.getCurrentItem() != null && isTriggerItem(event.getCurrentItem())) {
             getServer().getScheduler().runTask(this, () -> ((Player) event.getWhoClicked()).performCommand(triggerCommand));
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+            ItemStack item = event.getItem();
+            if (item != null && event.getPlayer().getInventory().getHeldItemSlot() == triggerSlot && isTriggerItem(item)) {
+                event.getPlayer().performCommand(triggerCommand);
+                event.setCancelled(true);
+            }
         }
     }
 
