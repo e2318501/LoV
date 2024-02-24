@@ -3,6 +3,7 @@ package net.nutchi.backpacktrigger;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,7 +24,7 @@ public final class BackpackTrigger extends JavaPlugin implements Listener {
         getServer().getScheduler().runTaskTimer(this, () -> getServer().getOnlinePlayers().forEach(this::setTriggerItem) , 0, 100);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getSlot() == triggerSlot && event.getCurrentItem() != null && isTriggerItem(event.getCurrentItem())) {
             getServer().getScheduler().runTask(this, () -> ((Player) event.getWhoClicked()).performCommand(triggerCommand));
@@ -52,7 +53,7 @@ public final class BackpackTrigger extends JavaPlugin implements Listener {
     private ItemStack getTriggerItem() {
         ItemStack item = new ItemStack(triggerMaterial);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("クリックでバックパックを開く");
+        meta.setDisplayName("クリックでメニューを開く");
         meta.setCustomModelData(triggerItemCustomModelData);
         item.setItemMeta(meta);
         return item;
