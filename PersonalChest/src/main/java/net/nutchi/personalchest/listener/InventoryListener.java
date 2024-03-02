@@ -24,12 +24,16 @@ public class InventoryListener implements Listener {
 
             if (loc != null) {
                 Material type = loc.getBlock().getType();
-                if (type.equals(Material.CHEST) || type.equals(Material.TRAPPED_CHEST)) {
+                if ((type.equals(Material.CHEST) || type.equals(Material.TRAPPED_CHEST)) && isTargetWorld(loc)) {
                     player.openInventory(plugin.getPChestManager().getPlayerInventory(loc, player.getUniqueId(), event.getInventory()));
                     player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 1, 1);
                     event.setCancelled(true);
                 }
             }
         }
+    }
+
+    private boolean isTargetWorld(Location loc) {
+        return loc.getWorld() != null && plugin.getConfig().getStringList("worlds").contains(loc.getWorld().getName());
     }
 }

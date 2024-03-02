@@ -4,7 +4,6 @@ main: net.nutchi.personalchest.PersonalChest
 api-version: '1.19'
 commands:
   personalchest:
+    aliases: [ pc ]
     usage: |
-      /<command> apply
-      /<command> remove
-      /<command> open [<name>]
+      /<command> reload
