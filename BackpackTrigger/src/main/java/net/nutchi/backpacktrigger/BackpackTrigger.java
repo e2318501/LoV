@@ -14,7 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class BackpackTrigger extends JavaPlugin implements Listener {
     private static final int triggerSlot = 8;
-    private static final Material triggerMaterial = Material.PAPER;
+    private static final Material triggerItemMaterial = Material.PAPER;
+    private static final String triggerItemDisplayName = "クリックでメニューを開く";
     private static final int triggerItemCustomModelData = 10048;
     private static final String triggerCommand = "commandpanel menu";
 
@@ -51,17 +52,18 @@ public final class BackpackTrigger extends JavaPlugin implements Listener {
     }
 
     private ItemStack getTriggerItem() {
-        ItemStack item = new ItemStack(triggerMaterial);
+        ItemStack item = new ItemStack(triggerItemMaterial);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("クリックでメニューを開く");
+        meta.setDisplayName(triggerItemDisplayName);
         meta.setCustomModelData(triggerItemCustomModelData);
         item.setItemMeta(meta);
         return item;
     }
 
     private boolean isTriggerItem(ItemStack item) {
-        return item.getType() == triggerMaterial &&
+        return item.getType() == triggerItemMaterial &&
                 item.getItemMeta() != null &&
+                item.getItemMeta().getDisplayName().equals(triggerItemDisplayName) &&
                 item.getItemMeta().hasCustomModelData() &&
                 item.getItemMeta().getCustomModelData() == triggerItemCustomModelData;
     }
