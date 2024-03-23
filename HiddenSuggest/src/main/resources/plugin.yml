@@ -1,0 +1,8 @@
+name: HiddenSuggest
+version: '${project.version}'
+main: net.nutchi.hiddensuggest.HiddenSuggest
+api-version: '1.19'
+permissions:
+    hiddensuggest.bypass:
+        description: Allows the player to see command suggestions
+        default: op
